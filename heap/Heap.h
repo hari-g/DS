@@ -3,7 +3,8 @@
 //Description: Implementation of Min Heap
 //
 //Creating a Heap, it takes Maximum capacity as parameter
-//Usage : Heap *heap = new Heap(100);
+//Usage : Heap *minHeap      = new Heap(100); --> for Min Heap
+//	  Heap	*maxHeap     = new Heap(100, true) --> for Max Heap
 //
 //Functions:
 //	Add(long int v) -> Adds elements to the heap
@@ -15,7 +16,7 @@
 //	retun Value: 0 is returned if element is returned
 //		    -1 is returned if element is not present
 //
-//	getMinimum() -> Returns the minimum value from the heap
+//	getRoot() -> Returns the minimum/maximum value from the heap
 //		It does not return error code, So this should be 
 //		called only on non-empty heap 
 //      usage: if(heap->getSize() > 0) { cout >> heap->getMinimum(); }
@@ -27,11 +28,7 @@
 #ifndef __HEAP_H_
 #define __HEAP_H_
 
-#include <cmath>
-#include <cstdio>
-#include <vector>
 #include <iostream>
-#include <algorithm>
 
 #define LEFT(i)  (2*i+1)
 #define RIGHT(i) (2*i+2)

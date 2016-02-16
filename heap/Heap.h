@@ -41,18 +41,19 @@ private:
    long int *array;
    int maxCapacity;
    int size;
-   std::string heapType;
+   bool IsMaxHeap;
    void trickleUp(int index);
    void trickleDown(int index);
    int findElement(long int v);
    int recfind(long int v, int index);
    void swapElements(int index1, int index2);
+   bool compElements(long int val1, long int val2);
 public:
-   Heap(int MaxSize);
+   Heap(int MaxSize, bool IsMaxHeap = false);
    ~Heap();
    int Add(long int v);
    int Delete(long int v);
-   long int getMinimum();
+   long int getRoot();
    int getSize();
 };
 

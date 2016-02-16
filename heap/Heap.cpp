@@ -7,18 +7,18 @@
 
 #include "Heap.h"
 
-Heap::Heap(int MaxSize) {
-    array = (long int *) malloc(sizeof(long int)*MaxSize);
+Heap::Heap(int MaxSize, bool type) {
+    array = new long int[MaxSize];
     if(array == NULL) {
         std::cerr << "Error:Memory allocation!" << std::endl;
     }
     maxCapacity = MaxSize;
-    heapType = "MinHeap";
-    size     = 0;
+    IsMaxHeap    = type;
+    size        = 0;
 }
 
 Heap::~Heap(){
-   delete(array);
+   delete [] array;
    array = NULL;
 }
 
@@ -31,47 +31,51 @@ void Heap::swapElements(int index1, int index2) {
     array[index2] = temp;
 }
 
+bool Heap::compElements(long int val1, long int val2) {
+	if( IsMaxHeap == true) {
+		return val1 > val2 ? true : false;
+	} else {
+		return val1 < val2 ? true : false;
+	}
+}
+
 void Heap::trickleUp(int index) {
-    long int val = array[index];
+    long int curVal = array[index];
     int parent_index = (index-1)/2;
+    
     if(parent_index >=0) {
-        if(val<array[parent_index]) {
+        if(compElements(curVal,array[parent_index])) {
             array[index] = array[parent_index];
-            array[parent_index] = val;
+            array[parent_index] = curVal;
             trickleUp(parent_index);
         }
     }
 }
 
 int Heap::recfind(long int v, int index){
-    if(array[index] == v){
-        return index;
-    }
-    
-    if(array[index] < v) {
-        int left = 2*index+1, right = 2*index+2;
-        int leftVal, rightVal;
-        if(left < size && right < size) {
-            leftVal = recfind(v,left);
-            rightVal = recfind(v,right);
-            return leftVal>rightVal? leftVal:rightVal;
-        } else if(left < size) {
-            leftVal = recfind(v,left);
-            return leftVal;
-        } else if(right < size){
-            rightVal = recfind(v,right);
-            return rightVal;
-        }
+    int ret = -1;
+
+    if(index < 0 || index >= size) {
+	ret = -1;
+    } else if (array[index] == v) {
+        ret = index;
+    } else if(compElements(array[index], v)) {
+        int leftVal = -1, rightVal = -1;
         
+	leftVal  = recfind(v, LEFT(index));
+        rightVal = recfind(v, RIGHT(index));
+
+	ret =  (leftVal > rightVal) ? leftVal:rightVal;
     }
-    return 0;
+
+    return ret ;
 }
 
 int Heap::findElement(long int v) {
     return recfind(v, 0);
 }
 
-long int Heap::getMinimum(){
+long int Heap::getRoot(){
     return array[0];
 }
 
@@ -81,19 +85,21 @@ void Heap::trickleDown(int index) {
     // anyway if elements are equal
     int left  = LEFT(index)<size ? LEFT(index):index;
     int right = RIGHT(index)<size ? RIGHT(index):index;
-    int minIndex = (array[left]<array[right]) ? left:right;
-    int minVal = array[minIndex];
+    
+    int reqIndex = (compElements(array[left],array[right])) ? left:right;
+    int Val    = array[reqIndex];
     int cur    = array[index];
     
-    if(minVal < cur) {
-	swapElements(minIndex, index);
-        trickleDown(minIndex);
+    if(compElements(Val,cur)) {
+	swapElements(reqIndex, index);
+        trickleDown(reqIndex);
     }
 }
 
 int Heap::Delete(long int v){
     int index = findElement(v);
-    if(array[index] != v) {
+    
+    if(index == -1) {
         return -1;
     }
     array[index] = array[size-1];
@@ -105,20 +111,21 @@ int Heap::Delete(long int v){
 // return 0 if successfully added
 //       -1 if Maximum capacity is reached 
 int Heap::Add(long int v) {
-    if(size<=maxCapacity){
-        array[size]=v;
-        trickleUp(size);
+    int insertPos = size;
+
+    if(size < maxCapacity) {
         size++;
+        array[insertPos] = v;
+	trickleUp(insertPos);
         return 0;
     }
     return -1;
 }
 
-/* Unit Test
 int main() {
     int no=0,type=0;
     std::cin >> no;
-    Heap *heap = new Heap(100000);
+    Heap *heap = new Heap(100000, true);
     for(int i=0; i<no;i++) {
 	    std::cin >> type;
         switch(type){
@@ -138,7 +145,7 @@ int main() {
             }
             case 3:
             {
-                int min = heap->getMinimum();
+                int min = heap->getRoot();
 		std::cout << min << std::endl;
                 break;
             }
@@ -146,4 +153,3 @@ int main() {
     }
     return 0;
 }
-*/
